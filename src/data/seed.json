@@ -1,0 +1,119 @@
+[
+  {
+    "id": "py-pizza-discount-1",
+    "language": "python",
+    "difficulty": 1,
+    "topic": "Loops and conditions",
+    "bugType": "Incorrect Arithmetic Operator",
+    "title": "Pizza Order Discount Bug",
+    "theme": "Pizza Order Bill Calculator",
+    "buggyCode": "def calculate_pizza_total(prices, discount):\n    total = 0\n    for price in prices:\n        total += price\n    if total > 30:\n        total += discount\n    return total",
+    "correctCode": "def calculate_pizza_total(prices, discount):\n    total = 0\n    for price in prices:\n        total += price\n    if total > 30:\n        total -= discount\n    return total",
+    "tests": [
+      {
+        "id": "t1",
+        "description": "Order total under 30 (no discount)",
+        "input": [[10, 15], 5],
+        "expectedOutput": 25
+      },
+      {
+        "id": "t2",
+        "description": "Order total over 30 (applies discount)",
+        "input": [[15, 20], 5],
+        "expectedOutput": 30
+      },
+      {
+        "id": "t3",
+        "description": "Large order with discount",
+        "input": [[20, 20, 10], 10],
+        "expectedOutput": 40
+      }
+    ],
+    "expectedOutput": 30,
+    "symptomOutput": "Order over $30 resulted in $40 instead of $30.",
+    "bugLine": 6,
+    "explanation": "The discount was added to the total bill instead of subtracted on line 6. In financial calculations, discounts must reduce the total cost. Always verify arithmetic operators when applying reductions.",
+    "hints": [
+      "Examine how the discount is applied to the total after the threshold check.",
+      "Check if the arithmetic operation increases or decreases the final bill.",
+      "Should a discount of 5 dollars increase 35 to 40 or reduce it to 30?"
+    ],
+    "timeLimitMs": 3000,
+    "validated": true,
+    "createdAt": "2026-10-08T12:00:00.000Z"
+  },
+  {
+    "id": "py-score-tracker-3",
+    "language": "python",
+    "difficulty": 3,
+    "topic": "Dictionaries",
+    "bugType": "Key Overwrite Omission",
+    "title": "Arcade Score Accumulator Bug",
+    "theme": "Arcade High Score Tracker",
+    "buggyCode": "def compute_player_averages(match_logs):\n    scores = {}\n    counts = {}\n    for player, score in match_logs:\n        scores[player] = score\n        counts[player] = counts.get(player, 0) + 1\n    averages = {}\n    for player in scores:\n        averages[player] = scores[player] / counts[player]\n    return averages",
+    "correctCode": "def compute_player_averages(match_logs):\n    scores = {}\n    counts = {}\n    for player, score in match_logs:\n        scores[player] = scores.get(player, 0) + score\n        counts[player] = counts.get(player, 0) + 1\n    averages = {}\n    for player in scores:\n        averages[player] = scores[player] / counts[player]\n    return averages",
+    "tests": [
+      {
+        "id": "t1",
+        "description": "Single match per player",
+        "input": [[["Alice", 100], ["Bob", 200]]],
+        "expectedOutput": {"Alice": 100.0, "Bob": 200.0}
+      },
+      {
+        "id": "t2",
+        "description": "Multiple matches per player requiring score accumulation",
+        "input": [[["Alice", 100], ["Alice", 200], ["Bob", 150]]],
+        "expectedOutput": {"Alice": 150.0, "Bob": 150.0}
+      }
+    ],
+    "expectedOutput": {"Alice": 150.0, "Bob": 150.0},
+    "symptomOutput": "Alice average returned 100.0 instead of 150.0.",
+    "bugLine": 5,
+    "explanation": "The loop assignment `scores[player] = score` on line 5 overwrote previous scores instead of accumulating them. To calculate an average across multiple entries, total scores must be summed before dividing by the count. Using `scores.get(player, 0) + score` correctly preserves historical totals.",
+    "hints": [
+      "Inspect what happens inside the loop when a player has multiple entries.",
+      "Compare how scores[player] is updated versus how counts[player] is updated.",
+      "Does line 5 add to the player's total score or replace it completely?"
+    ],
+    "timeLimitMs": 3000,
+    "validated": true,
+    "createdAt": "2026-10-08T12:00:00.000Z"
+  },
+  {
+    "id": "py-route-planner-4",
+    "language": "python",
+    "difficulty": 4,
+    "topic": "Recursion",
+    "bugType": "Missing Parameter State Accumulation",
+    "title": "Delivery Route Fuel Accumulator Bug",
+    "theme": "Food Delivery Route Planner",
+    "buggyCode": "def count_valid_routes(distances, max_fuel, current_index=0, current_fuel=0):\n    if current_fuel > max_fuel:\n        return 0\n    if current_index == len(distances):\n        return 1\n    return count_valid_routes(distances, max_fuel, current_index + 1, current_fuel)",
+    "correctCode": "def count_valid_routes(distances, max_fuel, current_index=0, current_fuel=0):\n    if current_fuel > max_fuel:\n        return 0\n    if current_index == len(distances):\n        return 1\n    return count_valid_routes(distances, max_fuel, current_index + 1, current_fuel + distances[current_index])",
+    "tests": [
+      {
+        "id": "t1",
+        "description": "Route within fuel capacity",
+        "input": [[10, 15], 30],
+        "expectedOutput": 1
+      },
+      {
+        "id": "t2",
+        "description": "Route exceeding fuel limit",
+        "input": [[20, 25], 30],
+        "expectedOutput": 0
+      }
+    ],
+    "expectedOutput": 0,
+    "symptomOutput": "Route exceeding fuel capacity returned 1 instead of 0.",
+    "bugLine": 6,
+    "explanation": "The recursive call passed `current_fuel` unchanged on line 6 rather than adding `distances[current_index]`. When tracking resource constraints recursively, state values must accumulate at each step. Adding the leg distance ensures routes exceeding capacity are correctly pruned.",
+    "hints": [
+      "Trace how current_fuel changes across recursive calls.",
+      "Look at the 4th argument passed to count_valid_routes on line 6.",
+      "Is the fuel cost of the current leg (distances[current_index]) being added to current_fuel?"
+    ],
+    "timeLimitMs": 3000,
+    "validated": true,
+    "createdAt": "2026-10-08T12:00:00.000Z"
+  }
+]

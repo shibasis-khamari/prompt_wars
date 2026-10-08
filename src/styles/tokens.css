@@ -1,0 +1,124 @@
+/* ==========================================================================
+   Bug Hunt Arena Design Tokens (tokens.css)
+   Model: Diagnostic Code Editor Light Surface
+   ========================================================================== */
+
+:root {
+  /* 6 Core Named Hex Colors */
+  --surface: #F8F9FA;
+  --surface-panel: #FFFFFF;
+  --ink: #1A1D20;
+  --diagnostic-error: #C92A2A;
+  --diagnostic-pass: #2B8A3E;
+  --border-neutral: #D0D7DE;
+
+  /* Functional Tints & Supporting Tokens */
+  --ink-muted: #57606A;
+  --surface-highlight: #EDF2F7;
+  --surface-error-subtle: #FFF5F5;
+  --surface-pass-subtle: #EBFBEE;
+  --focus-ring: #0969DA;
+  --diagnostic-warn: #D9730D;
+
+  /* Typefaces */
+  --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, Menlo, monospace;
+
+  /* Type Scale */
+  --text-caption: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;         /* 14px */
+  --text-base: 1rem;           /* 16px */
+  --text-h3: 1.25rem;          /* 20px */
+  --text-h2: 1.5rem;           /* 24px */
+  --text-h1: 2.25rem;          /* 36px */
+
+  /* Spacing Scale (4px/8px Unit Grid) */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+
+  /* Structural Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+/* Base body styles */
+body.surface-body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Accessible focus ring */
+*:focus-visible {
+  outline: 2px solid var(--focus-ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Wavy Squiggle Underline Signature Motif */
+.diagnostic-squiggle {
+  text-decoration: underline wavy var(--diagnostic-error);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* Code line hover & active styling */
+.code-line-interactive {
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.code-line-interactive:hover {
+  background-color: var(--surface-highlight);
+}
+
+.code-line-interactive.is-selected-bug {
+  background-color: var(--surface-error-subtle);
+  border-left-color: var(--diagnostic-error);
+}
+
+.code-line-interactive.is-selected-normal {
+  background-color: var(--surface-highlight);
+  border-left-color: var(--border-neutral);
+}
+
+/* Single orchestrated pulse animation for hero bug reveal */
+@keyframes squiggle-pulse {
+  0% { transform: scale(0.99); }
+  50% { transform: scale(1.008); }
+  100% { transform: scale(1); }
+}
+
+.animate-bug-reveal {
+  animation: squiggle-pulse 0.25s ease-out;
+}
+
+@keyframes skeleton-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.45; }
+  100% { opacity: 1; }
+}
+
+/* Reduced motion compliance */
+@media (prefers-reduced-motion: reduce) {
+  .animate-bug-reveal,
+  .code-line-interactive,
+  .ui-skeleton {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

@@ -1,0 +1,126 @@
+@import './styles/tokens.css';
+
+:root {
+  font-family: var(--font-body), system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light;
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
+/* Accessible visible focus indicators */
+*:focus-visible {
+  outline: 2px solid var(--focus-ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* CodeMirror 6 Editor custom styling */
+.cm-editor {
+  border-radius: var(--radius-md);
+  background-color: var(--surface-panel);
+  color: var(--ink);
+}
+
+.cm-gutters {
+  background-color: var(--surface) !important;
+  border-right: 1px solid var(--border-neutral) !important;
+  color: var(--ink-muted) !important;
+}
+
+/* Game animations */
+@keyframes pop-in {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes solve-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes rankup-glow {
+  0%, 100% { border-color: rgba(59, 130, 246, 0.4); }
+  50% { border-color: rgba(234, 179, 8, 0.8); }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-solve-bounce {
+  animation: solve-bounce 0.6s ease-in-out;
+}
+
+.animate-rankup-glow {
+  animation: rankup-glow 1.5s ease-in-out infinite;
+}
+
+/* Accessibility: Strict respect for prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Responsive workspace layouts */
+.puzzle-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.puzzle-mobile-tabs-bar {
+  display: block;
+}
+
+.puzzle-desktop-actions-bar {
+  display: none;
+}
+
+.puzzle-mobile-actions-bar {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .puzzle-layout-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+  .puzzle-mobile-tabs-bar {
+    display: none !important;
+  }
+  .puzzle-desktop-actions-bar {
+    display: block !important;
+  }
+  .puzzle-mobile-actions-bar {
+    display: none !important;
+  }
+  .puzzle-col-left,
+  .puzzle-col-right {
+    display: flex !important;
+  }
+  .puzzle-editor-container {
+    display: block !important;
+  }
+}
+
+.setup-mobile-actions-bar {
+  display: flex;
+}
+
+@media (min-width: 768px) {
+  .setup-mobile-actions-bar {
+    display: none !important;
+  }
+}

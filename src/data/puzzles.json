@@ -1,0 +1,82 @@
+[
+  {
+    "id": "js-pizza-sum-1",
+    "language": "javascript",
+    "difficulty": 1,
+    "topic": "Loops and conditions",
+    "bugType": "Off-by-One Loop Boundary",
+    "title": "Pizza Bill Sum Off-by-One",
+    "theme": "Pizza Order Bill Calculator",
+    "buggyCode": "function solution(prices) {\n  let total = 0;\n  for (let i = 0; i < prices.length - 1; i++) {\n    total += prices[i];\n  }\n  return total;\n}",
+    "correctCode": "function solution(prices) {\n  let total = 0;\n  for (let i = 0; i < prices.length; i++) {\n    total += prices[i];\n  }\n  return total;\n}",
+    "tests": [
+      {
+        "id": "t1",
+        "description": "Sums multiple item prices",
+        "input": [[12, 15, 8]],
+        "expectedOutput": 35
+      },
+      {
+        "id": "t2",
+        "description": "Sums two items",
+        "input": [[10, 20]],
+        "expectedOutput": 30
+      },
+      {
+        "id": "t3",
+        "description": "Single item order",
+        "input": [[15]],
+        "expectedOutput": 15
+      }
+    ],
+    "expectedOutput": 35,
+    "symptomOutput": "Last item price is missing from the calculated total.",
+    "bugLine": 3,
+    "explanation": "The loop condition `i < prices.length - 1` stops one iteration before the last item. Array indices are 0-based, so the loop must continue while `i < prices.length`. Change the loop condition to include the final element.",
+    "hints": [
+      "Check the loop header condition on line 3.",
+      "Look at whether the final element in the array is being included in the sum.",
+      "Does `i < prices.length - 1` visit index `prices.length - 1`?"
+    ],
+    "timeLimitMs": 3000,
+    "validated": true,
+    "createdAt": "2026-10-08T12:00:00.000Z"
+  },
+  {
+    "id": "js-receipt-name-2",
+    "language": "javascript",
+    "difficulty": 2,
+    "topic": "Strings",
+    "bugType": "String Immutability Omission",
+    "title": "Receipt Name Uppercase Formatter",
+    "theme": "Customer Receipt Name Formatter",
+    "buggyCode": "function solution(name) {\n  name.toUpperCase();\n  return name;\n}",
+    "correctCode": "function solution(name) {\n  return name.toUpperCase();\n}",
+    "tests": [
+      {
+        "id": "t1",
+        "description": "Formats lowercase name",
+        "input": ["sarah"],
+        "expectedOutput": "SARAH"
+      },
+      {
+        "id": "t2",
+        "description": "Formats mixed case name",
+        "input": ["McLovin"],
+        "expectedOutput": "MCLOVIN"
+      }
+    ],
+    "expectedOutput": "SARAH",
+    "symptomOutput": "Returned 'sarah' instead of 'SARAH'.",
+    "bugLine": 2,
+    "explanation": "Strings in JavaScript are immutable, so `.toUpperCase()` returns a new string rather than modifying in-place. The returned value on line 2 was discarded. Returning `name.toUpperCase()` ensures the transformed string is returned.",
+    "hints": [
+      "Look at how string transformation methods work in JavaScript.",
+      "Check if strings in JavaScript can be mutated in place.",
+      "Should line 2 assign or directly return the result of `name.toUpperCase()`?"
+    ],
+    "timeLimitMs": 3000,
+    "validated": true,
+    "createdAt": "2026-10-08T12:00:00.000Z"
+  }
+]
