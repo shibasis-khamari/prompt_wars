@@ -29,5 +29,22 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       setupFiles: './src/test/setup.ts',
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-codemirror': [
+              '@codemirror/state',
+              '@codemirror/view',
+              '@codemirror/commands',
+              '@codemirror/lang-javascript',
+              '@codemirror/lang-python',
+              '@codemirror/theme-one-dark',
+            ],
+          },
+        },
+      },
+    },
   };
 });

@@ -214,7 +214,23 @@ class PythonRunner {
   private async runNodeFallback(code: string, _stdin: string, timeoutMs: number): Promise<PythonExecutionResult> {
     const start = performance.now();
     try {
-      const childProcess = eval("require('child_process')");
+      let childProcess: any = null;
+      if (typeof process !== 'undefined') {
+        if (typeof (process as any).getBuiltinModule === 'function') {
+          try {
+            childProcess = (process as any).getBuiltinModule('child_process');
+          } catch {}
+        }
+        if (!childProcess) {
+          try {
+            const req = (globalThis as any).require;
+            if (typeof req === 'function') childProcess = req('child_process');
+          } catch {}
+        }
+      }
+      if (!childProcess) {
+        throw new Error('child_process unavailable');
+      }
       const output = childProcess.execSync('python -', {
         input: code,
         timeout: timeoutMs,

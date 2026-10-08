@@ -2,6 +2,29 @@ import { Db } from 'mongodb';
 import seedPuzzles from '../../src/data/seed.json';
 import extraPuzzles from '../../src/data/puzzles.json';
 
+export interface StoredPuzzle {
+  id: string;
+  language: string;
+  difficulty: number;
+  topic: string;
+  title: string;
+  theme?: string;
+  bugType?: string;
+  bugLine?: number;
+  buggyCode: string;
+  correctCode?: string;
+  explanation?: string;
+  hints?: string[];
+  tests?: Array<{ id: string; description: string; input: unknown[]; expectedOutput: unknown }>;
+  symptomOutput?: string;
+  timeLimitMs?: number;
+  validated?: boolean;
+  codeHash?: string;
+  createdAt?: string | Date;
+  fallbackNotice?: string;
+  [key: string]: unknown;
+}
+
 export interface SelectionFilters {
   language?: string;
   difficulty?: number;
@@ -89,7 +112,7 @@ export async function findSampledEligiblePuzzle(
   db: Db | null,
   filters: SelectionFilters,
   excludedIds: string[]
-): Promise<any | null> {
+): Promise<StoredPuzzle | null> {
   const { language, difficulty, topic, mode } = filters;
 
   if (db) {
@@ -114,7 +137,7 @@ export async function findSampledEligiblePuzzle(
         .toArray();
 
       if (sampled.length > 0) {
-        return sampled[0];
+        return sampled[0] as unknown as StoredPuzzle;
       }
     } catch (err) {
       console.warn('MongoDB aggregation failed, falling back to local pool:', err);
@@ -134,7 +157,7 @@ export async function findSampledEligiblePuzzle(
 
   if (eligible.length === 0) return null;
   const randomIndex = Math.floor(Math.random() * eligible.length);
-  return eligible[randomIndex];
+  return eligible[randomIndex] as StoredPuzzle;
 }
 
 export async function recordServedHistory(

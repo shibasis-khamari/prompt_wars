@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { parse, serialize } from 'cookie';
+import type { IncomingMessage, ServerResponse } from 'http';
 
 const SESSION_SECRET = process.env.SESSION_SECRET || 'fallback_session_secret_change_in_production';
 const COOKIE_NAME = 'bughunt_session';
@@ -21,7 +22,7 @@ export function verifySessionToken(token: string): SessionData | null {
   }
 }
 
-export function setSessionCookie(res: any, token: string): void {
+export function setSessionCookie(res: ServerResponse | { setHeader: (name: string, value: string) => void }, token: string): void {
   const cookieHeader = serialize(COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -32,7 +33,7 @@ export function setSessionCookie(res: any, token: string): void {
   res.setHeader('Set-Cookie', cookieHeader);
 }
 
-export function clearSessionCookie(res: any): void {
+export function clearSessionCookie(res: ServerResponse | { setHeader: (name: string, value: string) => void }): void {
   const cookieHeader = serialize(COOKIE_NAME, '', {
     httpOnly: true,
     path: '/',
@@ -41,7 +42,7 @@ export function clearSessionCookie(res: any): void {
   res.setHeader('Set-Cookie', cookieHeader);
 }
 
-export function getSessionFromReq(req: any): SessionData | null {
+export function getSessionFromReq(req: IncomingMessage | { headers?: { cookie?: string } }): SessionData | null {
   const cookies = parse(req.headers?.cookie || '');
   const token = cookies[COOKIE_NAME];
   if (!token) return null;

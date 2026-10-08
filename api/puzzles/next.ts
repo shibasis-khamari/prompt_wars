@@ -10,6 +10,7 @@ import {
   checkIpRateLimit,
   generateAndSavePuzzle,
 } from '../lib/puzzleGeneratorBackend';
+import type { ApiRequest, ApiResponse } from '../types';
 
 function sanitizePuzzle(puzzle: any, fallbackNotice?: string) {
   const { correctCode, explanation, hints, ...sanitized } = puzzle;
@@ -19,7 +20,7 @@ function sanitizePuzzle(puzzle: any, fallbackNotice?: string) {
   return sanitized;
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -29,7 +30,14 @@ export default async function handler(req: any, res: any) {
     res.setHeader('Cache-Control', 'no-store');
   }
 
-  const { language = 'python', difficulty, topic, mode = 'mixed', exclude } = req.query || {};
+  const getQueryParam = (val: string | string[] | undefined): string | undefined =>
+    Array.isArray(val) ? val[0] : val;
+
+  const language = getQueryParam(req.query?.language) || 'python';
+  const difficultyRaw = getQueryParam(req.query?.difficulty);
+  const topic = getQueryParam(req.query?.topic);
+  const mode = getQueryParam(req.query?.mode) || 'mixed';
+  const exclude = req.query?.exclude;
 
   // 1. Strictly validate exclude list
   const excludeValidation = validateExcludeList(exclude);
@@ -38,7 +46,7 @@ export default async function handler(req: any, res: any) {
   }
 
   const session = getSessionFromReq(req);
-  const parsedDifficulty = difficulty ? parseInt(difficulty, 10) : 1;
+  const parsedDifficulty = difficultyRaw ? parseInt(difficultyRaw, 10) : 1;
   const clientIp =
     (req.headers?.['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
     req.socket?.remoteAddress ||

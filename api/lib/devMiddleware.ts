@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { parse as parseUrl } from 'url';
+import type { ApiRequest, ApiResponse } from '../types';
 
 // Import all API handlers
 import loginHandler from '../auth/login';
@@ -14,8 +15,8 @@ import hintHandler from '../puzzles/[id]/hint';
 import giveupHandler from '../puzzles/[id]/giveup';
 import solveHandler from '../puzzles/[id]/solve';
 
-export function enhanceResponse(res: ServerResponse) {
-  const enhanced = res as any;
+export function enhanceResponse(res: ServerResponse): ApiResponse {
+  const enhanced = res as ApiResponse;
   if (!enhanced.status) {
     enhanced.status = function (statusCode: number) {
       this.statusCode = statusCode;
@@ -63,7 +64,7 @@ export async function dispatchApiRequest(
   req: IncomingMessage,
   res: ServerResponse,
   next: () => void
-): Promise<void> {
+): Promise<unknown> {
   const parsed = parseUrl(req.url || '', true);
   const pathname = parsed.pathname || '';
 
@@ -72,9 +73,9 @@ export async function dispatchApiRequest(
   }
 
   const enhancedRes = enhanceResponse(res);
-  const enhancedReq = req as any;
+  const enhancedReq = req as ApiRequest;
 
-  enhancedReq.query = parsed.query || {};
+  enhancedReq.query = (parsed.query as Record<string, string | string[] | undefined>) || {};
   enhancedReq.body = await parseRequestBody(req);
 
   try {

@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { Db } from 'mongodb';
 import { GeminiAdapter, LLMAdapter } from '../../src/engine/llm';
 import { validatePuzzleDetailed } from '../../src/engine/validator';
+import type { StoredPuzzle } from './puzzleSelectorBackend';
 
 // Per-IP in-memory sliding window rate limiter
 const ipRateLimits = new Map<string, { count: number; resetAt: number }>();
@@ -102,7 +103,7 @@ export interface GenerateAndSaveOptions {
 }
 
 export interface GenerationResult {
-  puzzle: any | null;
+  puzzle: StoredPuzzle | null;
   fallbackNotice?: string;
   error?: string;
 }
@@ -213,11 +214,12 @@ export async function fallbackToNearestPuzzle(
 ): Promise<GenerationResult> {
   try {
     const diffOffsets = [1, -1, 2, -2, 3, -3];
+    const puzzlesCol = db.collection<StoredPuzzle>('puzzles');
     for (const offset of diffOffsets) {
       const altDiff = targetDifficulty + offset;
       if (altDiff < 1 || altDiff > 5) continue;
 
-      const candidate = await db.collection('puzzles').findOne({
+      const candidate = await puzzlesCol.findOne({
         validated: true,
         language,
         difficulty: altDiff,
@@ -233,7 +235,7 @@ export async function fallbackToNearestPuzzle(
     }
 
     // Try any topic at target difficulty
-    const anyTopicCandidate = await db.collection('puzzles').findOne({
+    const anyTopicCandidate = await puzzlesCol.findOne({
       validated: true,
       language,
       difficulty: targetDifficulty,
@@ -247,7 +249,7 @@ export async function fallbackToNearestPuzzle(
     }
 
     // Any validated puzzle in that language
-    const anyLangCandidate = await db.collection('puzzles').findOne({
+    const anyLangCandidate = await puzzlesCol.findOne({
       validated: true,
       language,
     });

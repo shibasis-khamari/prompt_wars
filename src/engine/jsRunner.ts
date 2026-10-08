@@ -107,11 +107,27 @@ class JSRunner {
       } catch (e) {}
     }
 
+function loadNodeModule<T = any>(moduleName: string): T | null {
+  if (typeof process !== 'undefined') {
+    if (typeof (process as any).getBuiltinModule === 'function') {
+      try {
+        return (process as any).getBuiltinModule(moduleName) as T;
+      } catch {}
+    }
+    try {
+      const req = (globalThis as any).require;
+      if (typeof req === 'function') return req(moduleName) as T;
+    } catch {}
+  }
+  return null;
+}
+
     // Node.js environment (Vitest test environment)
     if (typeof process !== 'undefined' && process.versions && process.versions.node) {
       try {
-        // Dynamically require node:worker_threads
-        const workerThreads = eval("require('worker_threads')");
+        // Dynamically load node:worker_threads in Node environments without eval
+        const workerThreads = loadNodeModule<any>('worker_threads');
+        if (!workerThreads) return null;
         const nodeWorker = new workerThreads.Worker(NODE_WORKER_CODE, { eval: true });
         
         // Wrap node worker to implement web Worker interface

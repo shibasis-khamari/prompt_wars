@@ -94,38 +94,41 @@ export const GameArena: React.FC<GameArenaProps> = () => {
     }, 2000);
 
     try {
-      const result = await apiSource.getNextPuzzle({
-        language: options.language,
-        difficulty: options.difficulty,
-        topic: options.topic || undefined,
-        mode: options.mode,
-      });
+      let chosen: Puzzle | null = null;
+      let notice: string | undefined;
 
-      clearTimeout(timer);
+      try {
+        const result = await apiSource.getNextPuzzle({
+          language: options.language,
+          difficulty: options.difficulty,
+          topic: options.topic || undefined,
+          mode: options.mode,
+        });
 
-      if (result?.poolExhausted) {
-        setPoolNotice(result.message || 'Pool exhausted for this category. Sign up to unlock infinite AI puzzles!');
-        setIsSelecting(false);
-        return;
+        if (result?.poolExhausted) {
+          setPoolNotice(result.message || 'Pool exhausted for this category. Sign up to unlock infinite AI puzzles!');
+          return;
+        }
+
+        if (result) {
+          chosen = result as unknown as Puzzle;
+          notice = result.fallbackNotice;
+        }
+      } catch (apiErr) {
+        console.warn('API getNextPuzzle error, falling back to local pool:', apiErr);
       }
 
-      if (result) {
-        launchPuzzle(result as unknown as Puzzle, result.fallbackNotice);
-        setIsSelecting(false);
-        return;
+      if (!chosen) {
+        const local = selectMatchingPuzzle(allPuzzles, { ...options, seenPuzzleIds });
+        chosen = local.puzzle;
+        notice = local.fallbackNotice;
       }
 
-      const localResult = selectMatchingPuzzle(allPuzzles, { ...options, seenPuzzleIds });
-      if (localResult.puzzle) {
-        launchPuzzle(localResult.puzzle, localResult.fallbackNotice);
-      }
-    } catch {
-      clearTimeout(timer);
-      const localResult = selectMatchingPuzzle(allPuzzles, { ...options, seenPuzzleIds });
-      if (localResult.puzzle) {
-        launchPuzzle(localResult.puzzle, localResult.fallbackNotice);
+      if (chosen) {
+        launchPuzzle(chosen, notice);
       }
     } finally {
+      clearTimeout(timer);
       setIsSelecting(false);
     }
   };

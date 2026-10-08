@@ -1,6 +1,7 @@
 import { GENERATOR_MODEL_ID } from '../src/config/models';
+import type { ApiRequest, ApiResponse } from './types';
 
-export async function handler(req: any, res: any) {
+export async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }

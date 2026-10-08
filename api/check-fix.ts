@@ -3,18 +3,19 @@ import extraPuzzles from '../src/data/puzzles.json';
 import { connectToDatabase } from './lib/db';
 import { checkFixRateLimiter } from './lib/rateLimiter';
 import { submitAndPollBatch } from './lib/judge0';
+import type { ApiRequest, ApiResponse } from './types';
 
 const MAX_CODE_SIZE_BYTES = 65536; // 64 KB
 
-function getClientIp(req: any): string {
+function getClientIp(req: ApiRequest): string {
   const forwarded = req.headers && (req.headers['x-forwarded-for'] || req.headers['X-Forwarded-For']);
   if (forwarded) {
     return (typeof forwarded === 'string' ? forwarded : forwarded[0]).split(',')[0].trim();
   }
-  return req.socket?.remoteAddress || req.connection?.remoteAddress || '127.0.0.1';
+  return req.socket?.remoteAddress || '127.0.0.1';
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
